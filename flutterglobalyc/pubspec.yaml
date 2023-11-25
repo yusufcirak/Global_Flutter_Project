@@ -1,0 +1,61 @@
+name: flutterglobalyc
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: '>=3.1.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.0.0
+  path: ^1.8.1
+  cupertino_icons: ^1.0.2
+  wifi_iot: ^0.3.18+1
+  quantity_input: ^1.0.2 
+  motion_tab_bar_v2: ^0.3.0
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - lib/images/zlogo.png
+    - lib/images/test.png
+    - lib/images/treatment.png
+    - lib/images/educations.png  
+    - lib/images/Marketing.png
+    - lib/images/setting.png
+    - lib/images/calendar.png
+    - lib/images/activedevicesimage.png
+    - lib/images/key.png
+    - lib/images/iconfr.png
+    - lib/images/a1.jpg
+    - lib/images/a2.jpg
+    - lib/images/a3.jpg
+    - lib/images/a4.jpg
+    - lib/images/a5.jpg
+    - lib/images/a6.jpg
+    - lib/images/st1.jpg
+    - lib/images/st2.png
+    - lib/images/st3.png
+    - lib/images/st4.jpg
+    - lib/images/st5.png
+    - lib/images/stepresim.jpg
+    - lib/images/step2resim.jpg
+    - lib/images/step3resim.jpg
+    - lib/images/step4resim.jpg
+    - lib/images/step5resim.jpg
+    - lib/images/vivapeelst1.jpg
+    - lib/images/iconvivafacial.png
+
+  fonts:
+    - family: FlutterIcons
+      fonts:
+        - asset:  lib/images/icons/fonts/icons.ttf
