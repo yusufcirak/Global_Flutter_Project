@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
-
-import 'package:flutterglobalyc/ActiveDevices/ActiveDevices.dart';
+import 'package:flutterglobalyc/ManufacturingMode/MmodeLogin.dart';
+import 'package:flutterglobalyc/ActiveDevices/ActiveDevicesPage.dart';
 void main() => runApp(MaterialApp(home: HomePage()));
 
 class HomePage extends StatelessWidget {
@@ -34,16 +34,15 @@ class _CustomLogoAnimationState extends State<CustomLogoAnimation>
     super.initState();
     // Bekleme süresi sonunda yönlendirme yapılacak.
     Future.delayed(Duration(seconds: 3), () {
-      checkDeviceStatusAndRedirect();
+      checkmanufacturerAndRedirect();
     });
   }
 
 
- Future<void> checkDeviceStatusAndRedirect() async {
-  bool isDeviceActive = await dbHelper.checkDeviceStatus();
+ Future<void> checkmanufacturerAndRedirect() async {
+  bool isManufacturerModeActive = await dbHelper.checkmanufacturerModeStatus();
 
-  if (isDeviceActive) {
-    // Cihaz aktifse Nawbar'e yönlendir
+  if (isManufacturerModeActive) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -51,11 +50,11 @@ class _CustomLogoAnimationState extends State<CustomLogoAnimation>
       ),
     );
   } else {
-    // Cihaz aktif değilse başka bir sayfaya yönlendir
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ActiveDevicesPage(),
+        builder: (context) => MmodeLogin(),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutterglobalyc/HomePage/Calendar/Calendar.dart';
 import 'package:flutterglobalyc/HomePage/Treatment/Treatment.dart';
 import 'package:flutterglobalyc/HomePage/Educations/Educations.dart';
@@ -26,41 +27,22 @@ class _NawbarState extends State<Nawbar> {
         title: Text(_getAppBarTitle()), // Dinamik olarak başlık belirleme
         //title center
         centerTitle: true,
-         automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
       ),
       body: _buildPage(_currentIndex),
-      bottomNavigationBar: BottomNavigationBar(
-         backgroundColor: Colors.white, // Burada arka plan rengini beyaz olarak ayarlayabilirsiniz
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        selectedItemColor: Colors.blue, // Seçili olan yazı rengi
-        unselectedItemColor: Colors.grey, // Seçili olmayan yazı rengi
-         selectedIconTheme: IconThemeData(color: Colors.blue),
-        unselectedIconTheme: IconThemeData(color: Colors.grey),
-        
-        type: BottomNavigationBarType.fixed, // Tüm yazıların görünmesini sağlar
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Image.asset('lib/images/treatment.png'),
-            label: 'Treatment',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('lib/images/educations.png'),
-            label: 'Educations',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('lib/images/Marketing.png'),
-            label: 'Marketing',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('lib/images/calendar.png'),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('lib/images/test.png'),
-            label: 'Settings',
-          ),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _currentIndex,
+        backgroundColor: Colors.transparent,
+        color: Colors.blue, // Seçili olan öğe rengi
+        buttonBackgroundColor: Colors.white, // Navigasyon çubuğunun arka plan rengi
+        items: <Widget>[
+          Image.asset('lib/images/treatment.png', width: 30, height: 30),
+          Image.asset('lib/images/educations.png', width: 30, height: 30),
+          Image.asset('lib/images/Marketing.png', width: 30, height: 30),
+          Image.asset('lib/images/calendar.png', width: 30, height: 30),
+          Image.asset('lib/images/test.png', width: 30, height: 30),
         ],
+        onTap: _onTabTapped,
       ),
     );
   }
@@ -78,7 +60,7 @@ class _NawbarState extends State<Nawbar> {
       case 4:
         return Settings();
       default:
-        return Treatment(); 
+        return Treatment();
     }
   }
 

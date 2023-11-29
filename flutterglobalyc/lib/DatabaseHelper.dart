@@ -27,7 +27,8 @@ class DatabaseHelper {
         email TEXT, 
         phonenumber INTEGER,
         devicestatus BOOLEAN,
-        personalcode INTEGER
+        personalcode INTEGER,
+        manufacturerModeStatus BOOLEAN
       )
     ''';
     await db.execute(createTableSql);
@@ -53,7 +54,20 @@ class DatabaseHelper {
     return await db.query(tableName);
   }
 
-  Future<bool> checkDeviceStatus() async {
+  Future<bool> checkmanufacturerModeStatus() async {
+    final db = await database;
+    final result =
+        await db.query(tableName, where: 'manufacturerModeStatus = ?', whereArgs: [true]);
+
+    return result.isNotEmpty;
+  }
+
+Future<void> setManufacturerModeStatus(bool status) async {
+  final db = await database;
+  await db.update(tableName, {'manufacturerModeStatus': status});
+}
+
+ Future<bool> checkDeviceStatus() async {
     final db = await database;
     final result =
         await db.query(tableName, where: 'devicestatus = ?', whereArgs: [true]);

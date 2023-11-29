@@ -1,32 +1,96 @@
 import 'package:flutter/material.dart';
-
-
+import 'package:serial_communication/serial_communication.dart';
+import 'package:flutterglobalyc/DatabaseHelper.dart';
+import 'package:flutterglobalyc/ActiveDevices/ActiveDevicesPage.dart';
+import 'package:flutterglobalyc/HomePage/Nawbar.dart';
+void main() => runApp(MaterialApp(home: MmDermelux()));
 class MmDermelux extends StatefulWidget {
   @override
   _MmDermeluxState createState() => _MmDermeluxState();
 }
 
 class _MmDermeluxState extends State<MmDermelux> {
-
+SerialCommunication serialCommunication = SerialCommunication();
   bool isHydroWand = false;
   bool isCooling = false;
   bool isOxy= false;
+  String logData = "";
+  String receivedData = "";
   int simpleIntInput = 0;
   double receiveTempData= 0.0; 
   bool powerCheckResult = true; // İlk test raporu, başlangıçta true
   bool temperatureCheckResult = false; // İkinci test raporu, başlangıçta false
- 
- 
+  String  HydroWandStart = "HydroWandStart";
+  String DeviceSerialNumber = "";
+  String  HydroWandStop = "HydroWandStop";
+  String  CoolingStart = "CoolingStart";
+  String  CoolingStop = "CoolingStop";
+  String  OxyStart = "OxyStart";
+  String  OxyStop = "OxyStop";
+  double  TempRead = 0.0;
+  
+  
 
 
+void SelectDevicePort() async {
+  SerialCommunication serialCommunication = SerialCommunication();
+
+  // Kullanılabilir portları al
+  List<String>? availablePorts = await serialCommunication.getAvailablePorts();
+
+  if (availablePorts != null && availablePorts.isNotEmpty) {
+    String? selectedPort = await selectESP32Port(availablePorts);
+
+    if (selectedPort != null) {
+      // // Open the selected port
+      await serialCommunication.openPort(serialPort: selectedPort, baudRate: 115200);
+      print("Port opened: $selectedPort");
+    } else {
+      print("ESP32 not found.");
+    }
+  } else {
+    print("No serial ports found.");
+  }
+}
+
+Future<String?> selectESP32Port(List<String> availablePorts) async {
+  for (String port in availablePorts) {
+      // Open port
+    await serialCommunication.openPort(serialPort: port, baudRate: 115200);
+// Send a test command and wait for the response
+    String? response = await serialCommunication.sendCommand(message: "ESP32_TEST");
 
 
+   // Check if the response contains "ESP32"
+  if (response != null && response.contains("ESP32")) {
+  // ESP32 found, handle accordingly
+  return port; // Assuming this code is within a function that returns a String?
+}
 
 
+    // ESP32 değilse portu kapat
+    await serialCommunication.closePort();
+  }
+
+  return null; // ESP32 bulunamadı
+}
 
 
+// Widget oluşturulduğunda çalışır. Başlangıçta cihaz portunu seçer.
+  @override
+  void initState() {
+    super.initState();
+    SelectDevicePort();
+    deviceCommand();
+  }
 
 
+//Widget kaldırıldığında çalışır. Seri iletişim objesini temizler.
+  @override
+  void dispose() {
+    serialCommunication.destroy();
+    super.dispose();
+  }
 
  
 
@@ -224,7 +288,7 @@ class _MmDermeluxState extends State<MmDermelux> {
       child: Padding(
         padding: EdgeInsets.only(top: 100.0),
         child: Text(
-           '$receiveTempData °C',
+           '$TempRead °C',
           style: TextStyle(fontSize: 30, color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
@@ -244,6 +308,25 @@ class _MmDermeluxState extends State<MmDermelux> {
         padding: EdgeInsets.only(top: 10.0),
         child: Text(
           'Temperature',
+          style: TextStyle(fontSize: 30, color: Colors.black),
+        ),
+      ),
+    ),
+
+  ],
+
+
+  ),  
+
+  Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Align(
+      alignment: Alignment.bottomLeft,
+      child: Padding(
+        padding: EdgeInsets.only(top: 10.0),
+        child: Text(
+          'Device Serial Number: $DeviceSerialNumber',
           style: TextStyle(fontSize: 30, color: Colors.black),
         ),
       ),
@@ -341,6 +424,29 @@ class _MmDermeluxState extends State<MmDermelux> {
           ),
 
 
+Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    Align(
+      alignment: Alignment.bottomLeft,
+      child: Padding(
+        padding: EdgeInsets.only(top: 30.0),
+        child: ElevatedButton(
+          onPressed: () async {
+            await DatabaseHelper().setManufacturerModeStatus(true);
+           
+            checkDeviceStatus();
+          },
+          style: ButtonStyle(
+            minimumSize: MaterialStateProperty.all(Size(150, 80)), // Genişlik ve yükseklik değerlerini ayarlayın
+          ),
+          child: Text('Manufacturer Mode Completed'),
+        ),
+      ),
+    ),
+  ],
+)
+
 
 
              
@@ -350,7 +456,10 @@ class _MmDermeluxState extends State<MmDermelux> {
         ],
       ),
     );
+
+    
   }
+  
    void updatePowerCheckResult(bool result) {
     setState(() {
       powerCheckResult = result;
@@ -362,10 +471,90 @@ class _MmDermeluxState extends State<MmDermelux> {
       temperatureCheckResult = result;
     });
   }
+
+  
+  void StartSerial() async {
+    await serialCommunication.startSerial();
+  }
+
+  void StopSerial () async  {
+     await serialCommunication.closePort();
+  }
+
+  void sendDataToSerial() async {
+    await serialCommunication.sendCommand(message: "Hello, ESP32!");
+  }
+
+   void updateConnectionStatus(SerialResponse? result) async {
+    setState(() {
+      logData = result!.logChannel ?? "";
+      receivedData = result.readChannel ?? "";
+    });
+  }
+
+
+void deviceCommand(){
+
+if (isHydroWand) {
+  serialCommunication.sendCommand(message: HydroWandStart);
+} else {
+  serialCommunication.sendCommand(message: HydroWandStop);
+} if (isCooling) {
+  serialCommunication.sendCommand(message: CoolingStart);
+} else {
+  serialCommunication.sendCommand(message: CoolingStop);
+} if (isOxy) {
+  serialCommunication.sendCommand(message: OxyStart);
+} else {
+  serialCommunication.sendCommand(message: OxyStop); 
+}
+serialCommunication.sendCommand(message: "TargetTemp:" + simpleIntInput.toString());
+
+     if (receivedData.startsWith("Temp:")) {
+      // Başlığı çıkart ve geri kalanı al
+      String temperatureValue = receivedData.substring(8);
+      double temperatureDoubleValue = double.parse(temperatureValue);
+      print("Temp: $temperatureDoubleValue");
+      setState(() {
+        TempRead = temperatureDoubleValue;
+      });
+    }
+
+    if (receivedData.startsWith("SerialNumber:")){
+      String SerialNumber = receivedData.substring(13);
+      print("SerialNumber: $SerialNumber");
+      setState(() {
+        DeviceSerialNumber = SerialNumber;
+      });
+
+
+    }
+}
+Future<void> checkDeviceStatus() async {
+  bool isDeviceActive = await dbHelper.checkDeviceStatus();
+
+  if (isDeviceActive) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Nawbar(),
+      ),
+    );
+  } else {
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ActiveDevicesPage(),
+      ),
+    );
+  }
 }
 
 void main() {
   runApp(MaterialApp(
     home: MmDermelux(),
   ));
+}
+
 }
