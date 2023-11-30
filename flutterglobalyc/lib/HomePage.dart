@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
-import 'package:flutterglobalyc/ManufacturingMode/MmodeLogin.dart';
-import 'package:flutterglobalyc/ActiveDevices/ActiveDevicesPage.dart';
+import 'package:flutterglobalyc/TestMode/ManufacturingMode/MmodeLogin.dart';
+import 'package:flutterglobalyc/TestMode/ActiveDevices/ActiveDevicesPage.dart';
 void main() => runApp(MaterialApp(home: HomePage()));
 
 class HomePage extends StatelessWidget {

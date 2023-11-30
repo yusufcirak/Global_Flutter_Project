@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
-import 'package:flutterglobalyc/ManufacturingMode/MmodeLogin.dart';
-import 'package:flutterglobalyc/ActiveDevices/ActiveDevicesPage.dart';
+import 'package:flutterglobalyc/TestMode/TestModeNawbar.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -66,24 +65,14 @@ class _SettingsState extends State<Settings> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ActiveDevicesPage(),
+                          builder: (context) => TestModeNawbar(),
                         ),
                       );
                     },
-                    child: Text('Manufacturer Mode'),
+                    child: Text('Test Mode'),
                   ),
                   SizedBox(width: 16.0), // İstedğiniz kadar boşluk ekleyebilirsiniz
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MmodeLogin(),
-                        ),
-                      );
-                    },
-                    child: Text('Active Device Mode'),
-                  ),
+                 
                 ],
               ),
             ),

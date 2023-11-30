@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
-import 'package:flutterglobalyc/ActiveDevices/PersonalCodePage.dart';
+import 'package:flutterglobalyc/TestMode/ActiveDevices/PersonalCodePage.dart';
 
 class WifiPage extends StatefulWidget {
   @override
@@ -8,6 +8,8 @@ class WifiPage extends StatefulWidget {
 }
 
 class _WifiPageState extends State<WifiPage> {
+
+  
   List<WifiNetwork> _wifiNetworks = [];
   String _selectedSSID = '';
   TextEditingController _passwordController = TextEditingController();
@@ -165,9 +167,13 @@ class _WifiPageState extends State<WifiPage> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+         title: Text('Active Devices'),
+           centerTitle: true,
+      ),
       body: Container(
         width: 800,
         height: 1280,
@@ -175,6 +181,21 @@ class _WifiPageState extends State<WifiPage> {
         decoration: BoxDecoration(color: Color(0xFFF6F9FF)),
         child: Stack(
           children: [
+            Positioned(
+                left: 300,
+                top: 104,
+                child: Container(
+                  width: 244,
+                  height: 62,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(),
+                  child: Image.asset(
+                    'lib/images/zlogo.png',
+                    width: 400,
+                    height: 400,
+                  ),
+                ),
+              ),
             Positioned(
               left: 200,
               top: 250,
@@ -200,13 +221,10 @@ class _WifiPageState extends State<WifiPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 100,
-                      child: Image.asset(
-                        'lib/images/zlogo.png',
-                        width: 200,
-                        height: 200,
-                      ),
+                      height: 50,
+                    
                     ),
+                    
                     SizedBox(height: 20),
                     Text(
                       'Choice your Wi-Fi',

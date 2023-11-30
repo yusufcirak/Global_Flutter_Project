@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
-import 'package:flutterglobalyc/ActiveDevices/PersonalCodeCheck.dart';
+import 'package:flutterglobalyc/TestMode/ActiveDevices/PersonalCodeCheck.dart';
 
 final dbHelper = DatabaseHelper();
 
@@ -16,6 +16,10 @@ class PersonalCodePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Active Devices'),
+           centerTitle: true, 
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
@@ -40,19 +44,7 @@ class PersonalCodePage extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(
-                left: 0,
-                top: 1232,
-                child: Container(
-                  width: 800,
-                  height: 48,
-                  child: Stack(
-                    children: [
-                      // Buraya Figma tasarımındaki öğeleri ekleyin
-                    ],
-                  ),
-                ),
-              ),
+             
               Positioned(
                 left: 170,
                 top: 246,
@@ -246,7 +238,6 @@ class PersonalCodePage extends StatelessWidget {
     );
   }
 }
-
 
 void main() {
   runApp(MaterialApp(

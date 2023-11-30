@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
 
 
-import 'package:flutterglobalyc/ActiveDevices/DeviceInfoPage.dart';
+import 'package:flutterglobalyc/TestMode/ActiveDevices/DeviceInfoPage.dart';
  final dbHelper = DatabaseHelper();
 class ActiveDevicesPage extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
@@ -23,7 +23,7 @@ class ActiveDevicesPage extends StatelessWidget {
       child: Stack(
         children: [
           Positioned(
-            left: 278,
+            left: 280,
             top: 104,
             child: Container(
               width: 244,
@@ -38,7 +38,7 @@ class ActiveDevicesPage extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: 140,
+            left: 170,
             top: 246,
             child: Container(
               width: 520,

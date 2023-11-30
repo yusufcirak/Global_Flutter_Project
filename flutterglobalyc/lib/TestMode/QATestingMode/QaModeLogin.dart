@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
-import 'package:flutterglobalyc/ManufacturingMode/MmodeSDevice.dart';
+import 'package:flutterglobalyc/TestMode/QATestingMode/QaModeSDevice.dart';
 
 
 
-class MmodeLogin extends StatefulWidget {
+class QaModeLogin extends StatefulWidget {
   @override
-  _MmodeLoginState createState() => _MmodeLoginState();
+  _QaModeLoginState createState() => _QaModeLoginState();
 }
 
-class _MmodeLoginState extends State<MmodeLogin> {
+class _QaModeLoginState extends State<QaModeLogin> {
   final String wifiSsid = "AndroidWifi"; // Bağlanılacak Wi-Fi ağının SSID'si
   final String wifiPassword = ""; // Wi-Fi şifresi
   bool _isConnected = false;
@@ -67,7 +67,7 @@ class _MmodeLoginState extends State<MmodeLogin> {
                 Padding(
                   padding: EdgeInsets.only(top: 130.0),
                   child: Text(
-                    'Manufacturing Mode',
+                    'QA Testing Mode',
                     style: TextStyle(fontSize: 30, color: Colors.black),
                   ),
                 ),
@@ -77,7 +77,9 @@ class _MmodeLoginState extends State<MmodeLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.warning,
+                     _isConnected
+                          ? Icons.wifi
+                          : Icons.warning,
                       size: 100,
                       color: const Color.fromARGB(255, 54, 53, 53),
                     ),
@@ -102,7 +104,7 @@ class _MmodeLoginState extends State<MmodeLogin> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => MmodeSDevice(),
+                            builder: (context) => QaModeSDevice(),
                         ),
                       );
                     } else {
@@ -130,7 +132,7 @@ class _MmodeLoginState extends State<MmodeLogin> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => MmodeSDevice(),
+                            builder: (context) => QaModeSDevice(),
                         ),
                       );
                   
@@ -159,6 +161,6 @@ class _MmodeLoginState extends State<MmodeLogin> {
 
 void main() {
   runApp(MaterialApp(
-    home: MmodeLogin(),
+    home: QaModeLogin(),
   ));
 }

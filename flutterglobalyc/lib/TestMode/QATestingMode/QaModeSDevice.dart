@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutterglobalyc/ManufacturingMode/DeviceTestMode/MmDermelux.dart';
-import 'package:flutterglobalyc/ManufacturingMode/DeviceTestMode/MmHydroVerstand.dart';
-import 'package:flutterglobalyc/ManufacturingMode/DeviceTestMode/MmVerstandHD.dart';
-import 'package:flutterglobalyc/ManufacturingMode/DeviceTestMode/MmCoolRestore.dart';
-
-
-class MmodeSDevice extends StatefulWidget {
+import 'package:flutterglobalyc/TestMode/QATestingMode/QATestMode/QaDermelux.dart';
+import 'package:flutterglobalyc/TestMode/QATestingMode/QATestMode/QaHydroVerstand.dart';
+import 'package:flutterglobalyc/TestMode/QATestingMode/QATestMode/QaVerstandHD.dart';
+import 'package:flutterglobalyc/TestMode/QATestingMode/QATestMode/QaCoolRestore.dart';
+class QaModeSDevice extends StatefulWidget {
   @override
-  _MmodeSDeviceState createState() => _MmodeSDeviceState();
+  _QaModeSDeviceState createState() => _QaModeSDeviceState();
 }
 
-class _MmodeSDeviceState extends State<MmodeSDevice> {
+class _QaModeSDeviceState extends State<QaModeSDevice> {
   String _selectedDevice = ""; // Seçilen cihaz modeli
   List<String> deviceList = ["DermeLuxx", "HydroVerstand","Verstand HD","CoolRestore"];
 
@@ -50,7 +48,7 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                 Padding(
                   padding: EdgeInsets.only(top: 130.0),
                   child: Text(
-                    'Manufacturing Mode',
+                    'QA Testing Mode',
                     style: TextStyle(fontSize: 30, color: Colors.black),
                   ),
                 ),
@@ -105,28 +103,28 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MmDermelux(),
+                              builder: (context) => QaDermelux(),
                             ),
                           );
                         } else if (_selectedDevice == "HydroVerstand") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MmHydroVerstand(),
+                              builder: (context) => QaHydroVerstand(),
                             ),
                           );
                         } else if (_selectedDevice == "Verstand HD") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MmVerstandHD(),
+                              builder: (context) => QaVerstandHD(),
                             ),
                           );
                         } else if (_selectedDevice == "CoolRestore") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MmCoolRestore(),
+                              builder: (context) => QaCoolRestore(),
                             ),
                           );
                         }

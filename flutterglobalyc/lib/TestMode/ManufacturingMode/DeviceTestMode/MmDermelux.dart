@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:serial_communication/serial_communication.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
-import 'package:flutterglobalyc/ActiveDevices/ActiveDevicesPage.dart';
+import 'package:flutterglobalyc/TestMode/ActiveDevices/ActiveDevicesPage.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
 void main() => runApp(MaterialApp(home: MmDermelux()));
 class MmDermelux extends StatefulWidget {

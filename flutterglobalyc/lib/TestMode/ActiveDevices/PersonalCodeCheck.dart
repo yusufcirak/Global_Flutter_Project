@@ -8,6 +8,10 @@ class PersonalCodeCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Active Devices'),
+           centerTitle: true,// Set your app bar title here
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
@@ -34,7 +38,7 @@ class PersonalCodeCheck extends StatelessWidget {
               ),
               Positioned(
                 left: 170,
-                top: 246,
+                top: 200,
                 child: Container(
                   width: 520,
                   height: 800,
@@ -237,7 +241,4 @@ void _showErrorDialog(BuildContext context, String errorMessage) {
     },
   );
 }
-
-
-
 }
