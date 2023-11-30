@@ -440,7 +440,7 @@ Row(
           style: ButtonStyle(
             minimumSize: MaterialStateProperty.all(Size(150, 80)), // Genişlik ve yükseklik değerlerini ayarlayın
           ),
-          child: Text('Manufacturer Mode Completed'),
+          child: Text('QA Testing Mode Completed'),
         ),
       ),
     ),
