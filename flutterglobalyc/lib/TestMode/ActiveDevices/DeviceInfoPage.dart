@@ -17,18 +17,20 @@ class DeviceInfoPage extends StatelessWidget {
           ),
         ),
         body: Container(
-          width: 800,
-          height: 1280,
+          width: 1280,
+          height: 800,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: Color(0xFFF6F9FF)),
           child: Stack(
             children: [
               Positioned(
-                left: 200,
-                top: 250,
+                
+                left: 375,
+                top: 200,
+                
                 child: Container(
                   width: 520,
-                  height: 594,
+                  height: 500,
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -47,7 +49,7 @@ class DeviceInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 300,
+                left: 500,
                 top: 104,
                 child: Container(
                   width: 244,
@@ -62,8 +64,8 @@ class DeviceInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 340,
-                top: 300,
+                left: 520,
+                top: 220,
                 child: Container(
                   width: 240,
                   height: 240,
@@ -76,8 +78,8 @@ class DeviceInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 255,
-                top: 598,
+                left: 430,
+                top: 500  ,
                 child: SizedBox(
                   width: 392,
                   child: Text(
@@ -94,8 +96,8 @@ class DeviceInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 265,
-                top: 628,
+                left: 430,
+                top: 550,
                 child: SizedBox(
                   width: 392,
                   child: Text(
@@ -112,8 +114,8 @@ class DeviceInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 280,
-                top: 708,
+                left: 450,
+                top: 575,
                 child: SizedBox(
                   width: 360,
                   height: 52,

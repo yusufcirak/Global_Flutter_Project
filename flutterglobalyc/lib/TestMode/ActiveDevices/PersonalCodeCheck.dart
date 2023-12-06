@@ -15,15 +15,15 @@ class PersonalCodeCheck extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
-          width: 800,
-          height: 1280,
+          width: 1280,
+          height: 800,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: Color(0xFFF6F9FF)),
           child: Stack(
             children: [
               Positioned(
-                left: 278,
-                top: 104,
+                    left: 500,
+                top: 50,
                 child: Container(
                   width: 244,
                   height: 62,
@@ -37,11 +37,12 @@ class PersonalCodeCheck extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 170,
-                top: 200,
+               left: 350,
+              right: 350,
+              top: 125,
                 child: Container(
                   width: 520,
-                  height: 800,
+                  height: 575,
                   child: Stack(
                     children: [
                       Positioned(
@@ -49,7 +50,7 @@ class PersonalCodeCheck extends StatelessWidget {
                         top: 0,
                         child: Container(
                           width: 520,
-                          height: 800,
+                          height: 575,
                           decoration: ShapeDecoration(
                             color: Colors.white,
                             shape: RoundedRectangleBorder(
@@ -135,11 +136,11 @@ class PersonalCodeCheck extends StatelessWidget {
     ];
 
     double buttonSize = 80.0;
-    double buttonSpacing = 40.0;
+    double buttonSpacing = 10.0;
 
     return Positioned(
-      left: 80,
-      top: 220,
+      left: 125,
+      top: 210,
       child: Column(
         children: keypadRows.map((row) {
           return Row(

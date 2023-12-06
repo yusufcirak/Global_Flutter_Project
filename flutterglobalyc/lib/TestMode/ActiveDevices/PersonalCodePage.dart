@@ -23,14 +23,14 @@ class PersonalCodePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Container(
-          width: 800,
-          height: 1280,
+          width: 1280,
+          height: 800,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(color: Color(0xFFF6F9FF)),
           child: Stack(
             children: [
               Positioned(
-                left: 278,
+                  left: 500,
                 top: 104,
                 child: Container(
                   width: 244,
@@ -46,11 +46,12 @@ class PersonalCodePage extends StatelessWidget {
               ),
              
               Positioned(
-                left: 170,
-                top: 246,
+                   left: 350,
+              right: 350,
+              top: 200,
                 child: Container(
                   width: 520,
-                  height: 596,
+                  height: 500,
                   child: Stack(
                     children: [
                       Positioned(
@@ -58,7 +59,7 @@ class PersonalCodePage extends StatelessWidget {
                         top: 0,
                         child: Container(
                           width: 520,
-                          height: 596,
+                          height: 500,
                           decoration: ShapeDecoration(
                             color: Colors.white,
                             shape: RoundedRectangleBorder(

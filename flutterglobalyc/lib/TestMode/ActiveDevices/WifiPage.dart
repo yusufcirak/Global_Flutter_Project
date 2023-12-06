@@ -175,14 +175,14 @@ class _WifiPageState extends State<WifiPage> {
            centerTitle: true,
       ),
       body: Container(
-        width: 800,
-        height: 1280,
+        width: 1280,
+        height: 800,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(color: Color(0xFFF6F9FF)),
         child: Stack(
           children: [
             Positioned(
-                left: 300,
+                left: 500,
                 top: 104,
                 child: Container(
                   width: 244,
@@ -197,11 +197,12 @@ class _WifiPageState extends State<WifiPage> {
                 ),
               ),
             Positioned(
-              left: 200,
-              top: 250,
+              left: 400,
+              right: 400,
+              top: 200,
               child: Container(
                 width: 520,
-                height: 594,
+                height: 500,
                 decoration: ShapeDecoration(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
