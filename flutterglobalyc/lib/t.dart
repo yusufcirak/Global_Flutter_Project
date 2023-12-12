@@ -3,73 +3,14 @@ import 'package:serial_communication/serial_communication.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
 import 'package:flutterglobalyc/TestMode/ActiveDevices/ActiveDevicesPage.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
-
 void main() => runApp(MaterialApp(home: MmDermelux()));
 class MmDermelux extends StatefulWidget {
   @override
   _MmDermeluxState createState() => _MmDermeluxState();
 }
 
-class SerialCommunicationHelper {
-  SerialCommunication _serialCommunication = SerialCommunication();
-
-Future<void> getAvailablePorts() async {
-    List<String>? ports = await _serialCommunication.getAvailablePorts();
-    if (ports != null) {
-      print('Available ports: $ports');
-    }
-  }
-
-  // Open the serial port
-  Future<void> openSerialPort() async {
-    String? result = await _serialCommunication.openPort(
-      serialPort: "/dev/ttyS7",
-      baudRate: 115200,
-         dataFormat: DataFormat.ASCII,
-    );
-    if (result != null) {
-      print('Open port: $result');
-    }
-  }
-
-
-
-  // Initializing the serial port
-  Future<void> startSerial() async {
-    _serialCommunication.startSerial().listen(_updateConnectionStatus);
-  }
-
-  // Closing the serial port
-  void closeSerial() {
-    _serialCommunication.closePort();
-  }
-
-  // Send data
-  void sendSerialData(String data) {
-    _serialCommunication.sendCommand(message: data);
-  }
-
-  // Data retrieval
-  void listenForData() {
-    _serialCommunication.startSerial().listen((SerialResponse? result) {
-      if (result != null && result.readChannel != null) {
-        // Alınan veriyi işleme
-        print('Received data: ${result.readChannel}');
-      }
-    });
-  }
-
-   // Update the status of the serial port
-
-  void _updateConnectionStatus(SerialResponse? result) {
-    if (result != null && result.logChannel != null) {
-      print('Connection status: ${result.logChannel}');
-    }
-  }
-}
-
 class _MmDermeluxState extends State<MmDermelux> {
-
+SerialCommunication serialCommunication = SerialCommunication();
   bool isHydroWand = false;
   bool isCooling = false;
   bool isOxy= false;
@@ -77,8 +18,8 @@ class _MmDermeluxState extends State<MmDermelux> {
   String receivedData = "";
   int simpleIntInput = 0;
   double receiveTempData= 0.0; 
-  bool powerCheckResult = true; 
-  bool temperatureCheckResult = false; 
+  bool powerCheckResult = true; // İlk test raporu, başlangıçta true
+  bool temperatureCheckResult = false; // İkinci test raporu, başlangıçta false
   String  HydroWandStart = "1";
   String DeviceSerialNumber = "";
   String  HydroWandStop = "2";
@@ -89,28 +30,56 @@ class _MmDermeluxState extends State<MmDermelux> {
   double  TempRead = 0.0;
   
   
+ List<String> availablePorts = [];
+  String? selectedPort;
+//D/SerialPort(21207): Found new device: /dev/ttyS7
+//D/SerialPort(21207): Found new device: /dev/ttyS0
+//D/SerialPort(21207): Found new device: /dev/ttyS2
+///SerialPort(21207): Found new device: /dev/ttyS1
+List<String>? serialList = [];
 
-  SerialCommunicationHelper serialHelper = SerialCommunicationHelper();
+ void updateSelectedPort(String? port) {
+    setState(() {
+      selectedPort = "/dev/ttyS1";
+    });
+  }
+void _updateConnectionStatus(SerialResponse? result) async {
+    setState(() {
+      logData = result!.logChannel ?? "";
+      receivedData = result.readChannel ?? "";
+    });
+  }
 
-@override
+  getSerialList() async {
+    serialList = await serialCommunication.getAvailablePorts();
+  }
+
   void initState() {
-    super.initState();
-   serialHelper.openSerialPort();
-    serialHelper.startSerial();
-    serialHelper.getAvailablePorts();
-
-    buttonStatus();
  
+
+    print("send");
+    print(selectedPort);
+    super.initState();
+    getAvailablePorts();
+    deviceCommand();
+
+       serialCommunication.startSerial().listen(_updateConnectionStatus);
+    getSerialList();
+//print the send command metods response
+serialCommunication.startSerial().listen((SerialResponse result) {
+      updateConnectionStatus(result);
+    });
+      var x = serialCommunication.sendCommand(message: "0001");
+        x.then((value) => print("hata2")).catchError((error) => null);
+     print(x.whenComplete(() => print("success")));
+
   }
 
   void dispose() {
-   serialHelper.closeSerial();
+    serialCommunication.destroy();
     super.dispose();
-
   }
-
-   
-  
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +112,28 @@ class _MmDermeluxState extends State<MmDermelux> {
                 style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 5.0),
-                    Row(
+       Center(
+  child: Container(
+    width: 200.0, 
+    child: DropdownButtonFormField(
+      value: selectedPort,
+      items: availablePorts
+          .map((port) => DropdownMenuItem(
+                child: Text(port),
+                value: port,
+              ))
+          .toList(),
+      onChanged: updateSelectedPort, 
+      decoration: InputDecoration(
+        labelText: 'Select Serial Port',
+      ),
+    ),
+  ),
+),
+
+
+
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
@@ -457,29 +447,59 @@ class _MmDermeluxState extends State<MmDermelux> {
     });
   }
 
-
-  void buttonStatus(){
-    if(isHydroWand){
-      serialHelper.sendSerialData(HydroWandStart);
-    }
-    else{
-      serialHelper.sendSerialData(HydroWandStop);
-    }
-    if(isCooling){
-      serialHelper.sendSerialData(CoolingStart);
-    }
-    else{
-      serialHelper.sendSerialData(CoolingStop);
-    }
-    if(isOxy){
-      serialHelper.sendSerialData(OxyStart);
-    }
-    else{
-      serialHelper.sendSerialData(OxyStop);
-    }
-
+  void StartSerial() async {
+    await serialCommunication.startSerial();
   }
-  
+
+  void StopSerial() async {
+    await serialCommunication.closePort();
+  }
+
+  void sendDataToSerial() async {
+    await serialCommunication.sendCommand(message: "Hello, ESP32!");
+  }
+
+  void updateConnectionStatus(SerialResponse? result) async {
+    setState(() {
+      logData = result!.logChannel ?? "";
+      receivedData = result.readChannel ?? "";
+    });
+  }
+
+  void deviceCommand() {
+    print(receivedData);
+if (isHydroWand) {
+  serialCommunication.sendCommand(message: HydroWandStart);
+} else {
+  serialCommunication.sendCommand(message: HydroWandStop);
+} if (isCooling) {
+  serialCommunication.sendCommand(message: CoolingStart);
+} else {
+  serialCommunication.sendCommand(message: CoolingStop);
+} if (isOxy) {
+  serialCommunication.sendCommand(message: OxyStart);
+} else {
+  serialCommunication.sendCommand(message: OxyStop); 
+}
+
+    serialCommunication.sendCommand(message: "TargetTemp:" + simpleIntInput.toString());
+
+    if (receivedData.startsWith("Temp:")) {
+      String temperatureValue = receivedData.substring(5);
+      double temperatureDoubleValue = double.parse(temperatureValue);
+      setState(() {
+        TempRead = temperatureDoubleValue;
+      });
+    }
+
+    if (receivedData.startsWith("SerialNumber:")) {
+      String SerialNumber = receivedData.substring(13);
+      setState(() {
+        DeviceSerialNumber = SerialNumber;
+      });
+    }
+  }
+
   Future<void> checkDeviceStatus() async {
     bool isDeviceActive = await dbHelper.checkDeviceStatus();
 
@@ -506,5 +526,13 @@ class _MmDermeluxState extends State<MmDermelux> {
     ));
   }
 
- 
+  void getAvailablePorts() async {
+    List<String>? ports = await serialCommunication.getAvailablePorts();
+    if (ports != null && ports.isNotEmpty) {
+      setState(() {
+        availablePorts = ports;
+        selectedPort = ports[0];
+      });
+    }
+  }
 }
