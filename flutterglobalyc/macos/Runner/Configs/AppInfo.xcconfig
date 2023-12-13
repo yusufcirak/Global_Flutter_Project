@@ -8,7 +8,7 @@
 PRODUCT_NAME = flutterglobalyc
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.flutterglobalyc
+PRODUCT_BUNDLE_IDENTIFIER = com.ycirak.flutterglobalyc
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 com.ycirak. All rights reserved.

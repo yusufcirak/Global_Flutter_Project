@@ -1,74 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:serial_communication/serial_communication.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutterglobalyc/TestMode/ActiveDevices/ActiveDevicesPage.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
+import 'package:flutter/services.dart';
 
 void main() => runApp(MaterialApp(home: MmDermelux()));
 class MmDermelux extends StatefulWidget {
+ 
+
+ 
   @override
   _MmDermeluxState createState() => _MmDermeluxState();
 }
 
-class SerialCommunicationHelper {
-  SerialCommunication _serialCommunication = SerialCommunication();
-
-Future<void> getAvailablePorts() async {
-    List<String>? ports = await _serialCommunication.getAvailablePorts();
-    if (ports != null) {
-      print('Available ports: $ports');
-    }
-  }
-
-  // Open the serial port
-  Future<void> openSerialPort() async {
-    String? result = await _serialCommunication.openPort(
-      serialPort: "/dev/ttyS7",
-      baudRate: 115200,
-         dataFormat: DataFormat.ASCII,
-    );
-    if (result != null) {
-      print('Open port: $result');
-    }
-  }
-
-
-
-  // Initializing the serial port
-  Future<void> startSerial() async {
-    _serialCommunication.startSerial().listen(_updateConnectionStatus);
-  }
-
-  // Closing the serial port
-  void closeSerial() {
-    _serialCommunication.closePort();
-  }
-
-  // Send data
-  void sendSerialData(String data) {
-    _serialCommunication.sendCommand(message: data);
-  }
-
-  // Data retrieval
-  void listenForData() {
-    _serialCommunication.startSerial().listen((SerialResponse? result) {
-      if (result != null && result.readChannel != null) {
-        // Alınan veriyi işleme
-        print('Received data: ${result.readChannel}');
-      }
-    });
-  }
-
-   // Update the status of the serial port
-
-  void _updateConnectionStatus(SerialResponse? result) {
-    if (result != null && result.logChannel != null) {
-      print('Connection status: ${result.logChannel}');
-    }
-  }
-}
 
 class _MmDermeluxState extends State<MmDermelux> {
+String portName = "";
+  int baudRate = 115200;
+  
+static const platform = MethodChannel('com.ycirak.flutterglobalyc/serial');
+   void setSerialPortSettings() async {
+    try {
+      final result = await platform.invokeMethod('setSerialPortSettings', {
+        'portName': portName,
+        'baudRate': baudRate,
+      });
+      print(result);
+    } catch (e) {
+      print(e);
+    }
+  }
+
 
   bool isHydroWand = false;
   bool isCooling = false;
@@ -89,29 +52,48 @@ class _MmDermeluxState extends State<MmDermelux> {
   double  TempRead = 0.0;
   
   
+Future<void> sendSerialData(String data) async {
+  try {
+    final String result = await platform.invokeMethod('sendData', {'data': data});
+    setState(() {
+      logData = result; // Log verilerini güncelle
+    });
+  } catch (e) {
+    print(e);
+  }
+}
 
-  SerialCommunicationHelper serialHelper = SerialCommunicationHelper();
+Future<void> receiveSerialData() async {
+  try {
+    final String result = await platform.invokeMethod('receiveSerialData');
+    setState(() {
+      receivedData = result; 
+    });
+  } catch (e) {
+    print(e);
+  }
+}
 
+  
 @override
   void initState() {
     super.initState();
-   serialHelper.openSerialPort();
-    serialHelper.startSerial();
-    serialHelper.getAvailablePorts();
-
-    buttonStatus();
- 
   }
 
   void dispose() {
-   serialHelper.closeSerial();
+
     super.dispose();
 
   }
-
-   
-  
-
+  Future<void> requestPermissions() async {
+  Map<Permission, PermissionStatus> permissions = await [
+    Permission.storage,
+ 
+  ].request();
+ Permission.storage.onDeniedCallback;
+  print('Storage Permission: ${permissions[Permission.storage]}');
+ 
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,6 +135,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isHydroWand = !isHydroWand;
+                                buttonStatus();
+
                           });
                         },
                         child: Text(isHydroWand ? 'ON' : 'OFF'),
@@ -176,6 +160,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isCooling = !isCooling;
+                                buttonStatus();
+
                           });
                         },
                         child: Text(isCooling ? 'ON' : 'OFF'),
@@ -205,6 +191,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isOxy = !isOxy;
+                                buttonStatus();
+
                           });
                         },
                         child: Text(isOxy ? 'ON' : 'OFF'),
@@ -458,27 +446,32 @@ class _MmDermeluxState extends State<MmDermelux> {
   }
 
 
-  void buttonStatus(){
-    if(isHydroWand){
-      serialHelper.sendSerialData(HydroWandStart);
-    }
-    else{
-      serialHelper.sendSerialData(HydroWandStop);
-    }
-    if(isCooling){
-      serialHelper.sendSerialData(CoolingStart);
-    }
-    else{
-      serialHelper.sendSerialData(CoolingStop);
-    }
-    if(isOxy){
-      serialHelper.sendSerialData(OxyStart);
-    }
-    else{
-      serialHelper.sendSerialData(OxyStop);
-    }
-
+void buttonStatus(){
+  if(isHydroWand == true){
+    sendSerialData(HydroWandStart);
   }
+  else{
+    sendSerialData(HydroWandStop);
+  }
+  if(isCooling == true){
+    sendSerialData(CoolingStart);
+  }
+  else{
+    sendSerialData(CoolingStop);
+  }
+  if(isOxy == true){
+    sendSerialData(OxyStart);
+  }
+  else{
+    sendSerialData(OxyStop);
+  }
+}
+  void updateTempRead(double result) {
+    setState(() {
+      TempRead = result;
+    });
+
+}
   
   Future<void> checkDeviceStatus() async {
     bool isDeviceActive = await dbHelper.checkDeviceStatus();
