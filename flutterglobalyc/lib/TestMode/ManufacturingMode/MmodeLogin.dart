@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/MmodeSDevice.dart';
-
+import 'package:flutterglobalyc/SerialPortManager.dart';
 
 
 class MmodeLogin extends StatefulWidget {
@@ -9,15 +9,26 @@ class MmodeLogin extends StatefulWidget {
   _MmodeLoginState createState() => _MmodeLoginState();
 }
 
+
 class _MmodeLoginState extends State<MmodeLogin> {
-  final String wifiSsid = "AndroidWifi"; // Bağlanılacak Wi-Fi ağının SSID'si
-  final String wifiPassword = ""; // Wi-Fi şifresi
+    final serialPortManager = SerialPortManager();
+  final String wifiSsid = "AndroidWifi"; 
+  final String wifiPassword = ""; 
   bool _isConnected = false;
   bool btnVisibalty=false;
+  String receivedData = "";
   @override
   void initState() {
     super.initState();
     _checkWifiConnection();
+
+    serialPortManager.openSerialPort();
+    serialPortManager.readData().then((value) {
+      setState(() {
+        receivedData = value;
+        print(receivedData);
+      });
+    });
   }
 
   void _checkWifiConnection() async {
@@ -108,6 +119,8 @@ class _MmodeLoginState extends State<MmodeLogin> {
                   onPressed: () {
 
                     if (_isConnected) {
+
+                        serialPortManager.sendData(wifiSsid+';'+wifiPassword+';');
                       Navigator.push(
                         context,
                         MaterialPageRoute(

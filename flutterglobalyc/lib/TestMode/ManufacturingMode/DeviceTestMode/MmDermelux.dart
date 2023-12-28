@@ -12,7 +12,6 @@ class MmDermelux extends StatefulWidget {
   final serialPortManager = SerialPortManager();
 
 
-
 class _MmDermeluxState extends State<MmDermelux> {
 
   bool isHydroWand = false; //HydroWand Start/Stop
@@ -47,12 +46,8 @@ class _MmDermeluxState extends State<MmDermelux> {
         print(receivedData);
       });
     });
-    checkDeviceStatus();
-
     deviceCommand();
-
-
-
+  
   }
 
   void dispose() {
@@ -105,6 +100,9 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isHydroWand = !isHydroWand;
+
+                            deviceCommand();
+
                           });
                         },
                         child: Text(isHydroWand ? 'ON' : 'OFF'),
@@ -128,6 +126,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isCooling = !isCooling;
+                           
+                            deviceCommand();
                           });
                         },
                         child: Text(isCooling ? 'ON' : 'OFF'),
@@ -157,6 +157,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                         onPressed: () {
                           setState(() {
                             isOxy = !isOxy;
+                           
+                            deviceCommand();
                           });
                         },
                         child: Text(isOxy ? 'ON' : 'OFF'),
@@ -183,6 +185,8 @@ class _MmDermeluxState extends State<MmDermelux> {
                             onPressed: () {
                               setState(() {
                                 simpleIntInput++;
+                                deviceCommand();
+                                
                               });
                             },
                             child: Text('+', style: TextStyle(fontSize: 24.0)),
@@ -218,6 +222,7 @@ class _MmDermeluxState extends State<MmDermelux> {
                             onPressed: () {
                               setState(() {
                                 simpleIntInput--;
+                                deviceCommand();
                               });
                             },
                             child: Text('-', style: TextStyle(fontSize: 24.0)),
@@ -433,12 +438,13 @@ class _MmDermeluxState extends State<MmDermelux> {
 
     void deviceCommand() {
       setState(() {
-        serialPortManager.sendData(HydroWand ? 'HydroWandOn' : 'HydroWandOff');
-        serialPortManager.sendData(Cooling ? 'CoolingOn' : 'CoolingOff');
-        serialPortManager.sendData(Oxy ? 'OxyOn' : 'OxyOff');
-        serialPortManager.sendData('CoolingSetting:$simpleIntInput');
+        serialPortManager.sendData(isHydroWand ? 'HydroWandOn;' : 'HydroWandOff;');
+        serialPortManager.sendData(isCooling ? 'CoolingOn;' : 'CoolingOff;');
+        serialPortManager.sendData(isOxy ? 'OxyOn;' : 'OxyOff;');
+        serialPortManager.sendData('CoolingSetting:$simpleIntInput;');
       });
     
+
 }
   void main() {
     runApp(MaterialApp(

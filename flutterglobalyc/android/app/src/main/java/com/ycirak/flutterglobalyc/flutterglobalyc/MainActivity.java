@@ -54,32 +54,32 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void openSerialPort() {
-        String devicePath = "/dev/ttyS7"; 
-        int baudRate = 115200; 
-    
-        try {
-            serialPort = new SerialPort(new File(devicePath), baudRate, 0);
-            outputStream = serialPort.getOutputStream();
-            inputStream = serialPort.getInputStream();
-    
-            readThread = new ReadThread();
-            readThread.start();
-        } catch (SecurityException | IOException e) {
-          
-        }
+      String devicePath="/dev/ttyS7";
+      int baundRate=115200;
+
+      try {
+        serialPort= new SerialPort(new File(devicePath),baundRate,0);
+        outputStream=serialPort.getOutputStream();
+        inputStream=serialPort.getInputStream();
+        readThread=new ReadThread();
+        readThread.start();
+      } catch(SecurityException | IOException e){
+        e.printStackTrace();
+      }
+        
     }
-    
+
     private void sendData(String data) {
         try {
             if (outputStream != null) {
-                byte[] byteData = data.getBytes("UTF-8"); 
+                byte[] byteData = data.getBytes("UTF-8");
+                
                 outputStream.write(byteData);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
 
     private String readSerialData() {
         if (inputStream == null) {
@@ -110,6 +110,14 @@ public class MainActivity extends FlutterActivity {
 
     private byte[] hexStringToByteArray(String hex) {
         int len = hex.length();
+
+            if(len % 2!=0){
+
+                hex=hex + "0";
+                len++;
+            }
+
+
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)

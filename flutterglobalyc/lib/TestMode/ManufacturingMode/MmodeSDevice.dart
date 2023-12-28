@@ -3,26 +3,76 @@ import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmDerm
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmHydroVerstand.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmVerstandHD.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmCoolRestore.dart';
-
+import 'package:flutterglobalyc/SerialPortManager.dart';
 
 class MmodeSDevice extends StatefulWidget {
   @override
   _MmodeSDeviceState createState() => _MmodeSDeviceState();
+  final serialPortManager = SerialPortManager();
 }
 
 class _MmodeSDeviceState extends State<MmodeSDevice> {
-  String _selectedDevice = ""; // Seçilen cihaz modeli
-  List<String> deviceList = ["DermeLuxx", "HydroVerstand","Verstand HD","CoolRestore"];
+  String _selectedDevice = "";
+  List<String> deviceList = ["DermeLuxx", "HydroVerstand", "Verstand HD", "CoolRestore"];
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // deviceList içindeki tekrarlayan öğeleri kaldır
+
     deviceList = deviceList.toSet().toList();
 
-    // _selectedDevice'ı default olarak ilk değerle ayarla (opsiyonel)
+   
     if (deviceList.isNotEmpty) {
       _selectedDevice = deviceList.first;
+    }
+  }
+
+  Future<void> _startProcess() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+  
+    const delayDuration = Duration(seconds: 5);
+
+    await Future.delayed(delayDuration);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    print("Selected Device: $_selectedDevice");
+
+    if (_selectedDevice == "DermeLuxx") {
+      serialPortManager.sendData("update;");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MmDermelux(),
+        ),
+      );
+    } else if (_selectedDevice == "HydroVerstand") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MmHydroVerstand(),
+        ),
+      );
+    } else if (_selectedDevice == "Verstand HD") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MmVerstandHD(),
+        ),
+      );
+    } else if (_selectedDevice == "CoolRestore") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MmCoolRestore(),
+        ),
+      );
     }
   }
 
@@ -60,7 +110,7 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 130.0),
+                      padding: EdgeInsets.only(top: 20.0),
                       child: Text(
                         'Choose Device Model:',
                         style: TextStyle(fontSize: 20, color: Colors.black),
@@ -70,7 +120,6 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                 ),
 
                 Row(
-                  
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(height: 150.0),
@@ -96,58 +145,51 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    OutlinedButton(
-                      onPressed: () {
-                      
-                        print("Selected Device: $_selectedDevice");
-                        
-                        if (_selectedDevice == "DermeLuxx") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MmDermelux(),
+                  ElevatedButton(
+                          onPressed: _isLoading
+                              ? null
+                              : () {
+                                  _startProcess();
+                                serialPortManager.sendData("update;"); 
+                                },
+                          style: ElevatedButton.styleFrom(
+                            side: BorderSide(width: 2.0, color: Colors.blue),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 15,
+                              horizontal: 30,
                             ),
-                          );
-                        } else if (_selectedDevice == "HydroVerstand") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MmHydroVerstand(),
-                            ),
-                          );
-                        } else if (_selectedDevice == "Verstand HD") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MmVerstandHD(),
-                            ),
-                          );
-                        } else if (_selectedDevice == "CoolRestore") {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MmCoolRestore(),
-                            ),
-                          );
-                        }
-                     
-                  
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(width: 2.0, color: Colors.blue),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 15, horizontal: 30),
-                      ),
-                      child: Text(
-                        'Start',
-                        style: TextStyle(fontSize: 18, color: Colors.blue),
-                      ),
-                    ),
+                          ),
+                          child: Text(
+                            'Start',
+                            style: TextStyle(fontSize: 18, color: Colors.blue),
+                          ),
+                        ),
                   ],
                 ),
               ],
             ),
           ),
+
+          // Progress bar eklemek için
+            if (_isLoading)
+  Positioned(
+    top: 650.0,
+    left: 0,
+    right: 0,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), 
+        ),
+        SizedBox(height: 10),
+        Text(
+          "Please wait...\nUpdate in progress..",
+          textAlign: TextAlign.center, // Yazıyı ortalamak için bu özelliği ekledik
+        ),
+      ],
+    ),
+  ),
         ],
       ),
     );
@@ -193,4 +235,10 @@ class _DropdownMenuExampleState extends State<DropdownMenuExample> {
       dropdownMenuEntries: widget.dropdownMenuEntries,
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: MmodeSDevice(),
+  ));
 }
