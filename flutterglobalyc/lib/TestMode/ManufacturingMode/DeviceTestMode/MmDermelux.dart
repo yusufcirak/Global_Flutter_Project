@@ -1,99 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutterglobalyc/TestMode/ActiveDevices/ActiveDevicesPage.dart';
 import 'package:flutterglobalyc/HomePage/Nawbar.dart';
-import 'package:flutter/services.dart';
+import 'package:flutterglobalyc/SerialPortManager.dart';
 
 void main() => runApp(MaterialApp(home: MmDermelux()));
 class MmDermelux extends StatefulWidget {
- 
-
- 
   @override
   _MmDermeluxState createState() => _MmDermeluxState();
 }
+  final serialPortManager = SerialPortManager();
+
 
 
 class _MmDermeluxState extends State<MmDermelux> {
-String portName = "";
-  int baudRate = 115200;
-  
-static const platform = MethodChannel('com.ycirak.flutterglobalyc/serial');
-   void setSerialPortSettings() async {
-    try {
-      final result = await platform.invokeMethod('setSerialPortSettings', {
-        'portName': portName,
-        'baudRate': baudRate,
-      });
-      print(result);
-    } catch (e) {
-      print(e);
-    }
-  }
+
+  bool isHydroWand = false; //HydroWand Start/Stop
+  bool isCooling = false;   //Cooling Start/Stop
+  bool isOxy= false;        //Oxy Start/Stop
+  String logData = "";      //Log Data
+  String receivedData = "";     //Received Data
+  int simpleIntInput = 0;       //Cooling Setting
+  double receiveTempData= 0.0;      //Temperature
+  bool powerCheckResult = false;     //Power Check
+  bool temperatureCheckResult = false;    //Temperature Check
+  bool  HydroWand =false;                //HydroWand
+  String DeviceSerialNumber ="";        //Device Serial Number
+  bool  Cooling=false;              //Cooling
+  bool  Oxy =false;               //Oxy
+  double  TempRead = 0.0;               //Temperature
 
 
-  bool isHydroWand = false;
-  bool isCooling = false;
-  bool isOxy= false;
-  String logData = "";
-  String receivedData = "";
-  int simpleIntInput = 0;
-  double receiveTempData= 0.0; 
-  bool powerCheckResult = true; 
-  bool temperatureCheckResult = false; 
-  String  HydroWandStart = "1";
-  String DeviceSerialNumber = "";
-  String  HydroWandStop = "2";
-  String  CoolingStart = "3";
-  String  CoolingStop = "4";
-  String  OxyStart = "5";
-  String  OxyStop = "6";
-  double  TempRead = 0.0;
-  
-  
-Future<void> sendSerialData(String data) async {
-  try {
-    final String result = await platform.invokeMethod('sendData', {'data': data});
-    setState(() {
-      logData = result; // Log verilerini güncelle
-    });
-  } catch (e) {
-    print(e);
-  }
-}
 
-Future<void> receiveSerialData() async {
-  try {
-    final String result = await platform.invokeMethod('receiveSerialData');
-    setState(() {
-      receivedData = result; 
-    });
-  } catch (e) {
-    print(e);
-  }
-}
 
   
-@override
+
+
+
+  @override
   void initState() {
     super.initState();
+   serialPortManager.openSerialPort();
+    serialPortManager.readData().then((value) {
+      setState(() {
+        receivedData = value;
+        print(receivedData);
+      });
+    });
+    checkDeviceStatus();
+    serialPortManager.sendData('TestMode');
+
+
+
   }
 
   void dispose() {
-
+   
     super.dispose();
-
   }
-  Future<void> requestPermissions() async {
-  Map<Permission, PermissionStatus> permissions = await [
-    Permission.storage,
- 
-  ].request();
- Permission.storage.onDeniedCallback;
-  print('Storage Permission: ${permissions[Permission.storage]}');
- 
-}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,7 +91,10 @@ Future<void> receiveSerialData() async {
                 style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 5.0),
-                    Row(
+
+
+
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Column(
@@ -135,8 +104,6 @@ Future<void> receiveSerialData() async {
                         onPressed: () {
                           setState(() {
                             isHydroWand = !isHydroWand;
-                                buttonStatus();
-
                           });
                         },
                         child: Text(isHydroWand ? 'ON' : 'OFF'),
@@ -160,14 +127,12 @@ Future<void> receiveSerialData() async {
                         onPressed: () {
                           setState(() {
                             isCooling = !isCooling;
-                                buttonStatus();
-
                           });
                         },
                         child: Text(isCooling ? 'ON' : 'OFF'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isCooling ? Colors.green : Colors.red,
-                             fixedSize: Size(150, 50),
+                          fixedSize: Size(150, 50),
                         ),
                       ),
                       SizedBox(height: 16),
@@ -191,14 +156,12 @@ Future<void> receiveSerialData() async {
                         onPressed: () {
                           setState(() {
                             isOxy = !isOxy;
-                                buttonStatus();
-
                           });
                         },
                         child: Text(isOxy ? 'ON' : 'OFF'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isOxy ? Colors.green : Colors.red,
-                             fixedSize: Size(150, 50),
+                          fixedSize: Size(150, 50),
                         ),
                       ),
                       Text(
@@ -417,23 +380,23 @@ Future<void> receiveSerialData() async {
                     ),
                   ),
                 ],
-              ),  
+              ),
 
 
 
 
-             
-              ],
-            ),
+
+            ],
           ),
-       
+        ),
+
       ),
     );
 
-    
+
   }
-  
-    void updatePowerCheckResult(bool result) {
+
+  void updatePowerCheckResult(bool result) {
     setState(() {
       powerCheckResult = result;
     });
@@ -446,33 +409,7 @@ Future<void> receiveSerialData() async {
   }
 
 
-void buttonStatus(){
-  if(isHydroWand == true){
-    sendSerialData(HydroWandStart);
-  }
-  else{
-    sendSerialData(HydroWandStop);
-  }
-  if(isCooling == true){
-    sendSerialData(CoolingStart);
-  }
-  else{
-    sendSerialData(CoolingStop);
-  }
-  if(isOxy == true){
-    sendSerialData(OxyStart);
-  }
-  else{
-    sendSerialData(OxyStop);
-  }
-}
-  void updateTempRead(double result) {
-    setState(() {
-      TempRead = result;
-    });
 
-}
-  
   Future<void> checkDeviceStatus() async {
     bool isDeviceActive = await dbHelper.checkDeviceStatus();
 
@@ -499,5 +436,5 @@ void buttonStatus(){
     ));
   }
 
- 
+
 }

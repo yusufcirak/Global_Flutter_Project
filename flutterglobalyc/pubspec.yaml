@@ -17,6 +17,8 @@ dependencies:
   serial_communication: ^0.0.2
   curved_navigation_bar: ^1.0.3
   permission_handler: ^11.1.0
+  convert: ^3.0.1
+  root: ^2.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
