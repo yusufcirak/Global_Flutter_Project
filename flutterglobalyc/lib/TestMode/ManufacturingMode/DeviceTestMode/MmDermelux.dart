@@ -40,12 +40,7 @@ class _MmDermeluxState extends State<MmDermelux> {
   void initState() {
     super.initState();
    serialPortManager.openSerialPort();
-    serialPortManager.readData().then((value) {
-      setState(() {
-        receivedData = value;
-        print(receivedData);
-      });
-    });
+ 
     deviceCommand();
   
   }
@@ -446,6 +441,39 @@ class _MmDermeluxState extends State<MmDermelux> {
     
 
 }
+
+        void deviceRead() {
+  setState(() {
+    serialPortManager.readData().then((value) {
+      setState(() {
+        receivedData = value;
+
+        if (receivedData.contains("MAC Address:")) {
+        final macAddress = receivedData.split("MAC Address:")[1].split(";")[0];
+          print("MAC Address: $macAddress");
+        }
+
+        if (receivedData.contains("PowerCheck")) {
+          powerCheckResult = true;
+        }
+
+        if (receivedData.contains("TemperatureCheck")) {
+          temperatureCheckResult = true;
+         }
+
+       if (receivedData.contains("Temperature:")) {
+                
+                final temperature = receivedData.split("Temperature:")[1].split(";")[0];
+            TempRead = double.parse(temperature); // Veriyi double türüne çevir
+                print("Temperature: $TempRead");
+}
+      });
+    });
+  });
+}
+
+
+
   void main() {
     runApp(MaterialApp(
       home: MmDermelux(),
