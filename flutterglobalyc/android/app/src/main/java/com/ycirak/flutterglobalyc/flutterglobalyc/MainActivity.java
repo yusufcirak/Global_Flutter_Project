@@ -54,38 +54,32 @@ public class MainActivity extends FlutterActivity {
     }
 
     private void openSerialPort() {
-        SerialPortFinder serialPortFinder = new SerialPortFinder();
-        String[] allDevicesPath = serialPortFinder.getAllDevicesPath();
-
-        for (String devicePath : allDevicesPath) {
-            try {
-                int baudRate = 115200;
-                serialPort = new SerialPort(new File(devicePath), baudRate, 0);
-
-                outputStream = serialPort.getOutputStream();
-                inputStream = serialPort.getInputStream();
-
-                readThread = new ReadThread();
-                readThread.start();
-
-                break; // Serial port found and opened
-            } catch (SecurityException | IOException e) {
-                e.printStackTrace();
-                // Handle exceptions
-            }
+        String devicePath = "/dev/ttyS7"; 
+        int baudRate = 115200; 
+    
+        try {
+            serialPort = new SerialPort(new File(devicePath), baudRate, 0);
+            outputStream = serialPort.getOutputStream();
+            inputStream = serialPort.getInputStream();
+    
+            readThread = new ReadThread();
+            readThread.start();
+        } catch (SecurityException | IOException e) {
+          
         }
     }
-
-    private void sendData(String hexData) {
+    
+    private void sendData(String data) {
         try {
             if (outputStream != null) {
-                byte[] byteData = hexStringToByteArray(hexData);
+                byte[] byteData = data.getBytes("UTF-8"); 
                 outputStream.write(byteData);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    
 
     private String readSerialData() {
         if (inputStream == null) {

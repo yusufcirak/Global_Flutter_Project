@@ -48,7 +48,8 @@ class _MmDermeluxState extends State<MmDermelux> {
       });
     });
     checkDeviceStatus();
-    serialPortManager.sendData('TestMode');
+
+    deviceCommand();
 
 
 
@@ -430,11 +431,19 @@ class _MmDermeluxState extends State<MmDermelux> {
     }
   }
 
+    void deviceCommand() {
+      setState(() {
+        serialPortManager.sendData(HydroWand ? 'HydroWandOn' : 'HydroWandOff');
+        serialPortManager.sendData(Cooling ? 'CoolingOn' : 'CoolingOff');
+        serialPortManager.sendData(Oxy ? 'OxyOn' : 'OxyOff');
+        serialPortManager.sendData('CoolingSetting:$simpleIntInput');
+      });
+    
+}
   void main() {
     runApp(MaterialApp(
       home: MmDermelux(),
     ));
   }
-
 
 }
