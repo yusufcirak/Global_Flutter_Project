@@ -97,5 +97,16 @@ Future<bool> checkPersonalCode(int code) async {
 
   return result.isNotEmpty;
 }
+Future<void> insertOrUpdate(Map<String, dynamic> data) async {
+  final db = await database;
+  List<Map> existingRecords = await db.query(tableName);
 
+  if (existingRecords.isNotEmpty) {
+    // Eğer kayıt varsa, mevcut kaydı güncelle
+    await db.update(tableName, data, where: 'id = ?', whereArgs: [existingRecords.first['id']]);
+  } else {
+    // Eğer kayıt yoksa, yeni bir kayıt ekle
+    await db.insert(tableName, data);
+  }
+}
 }

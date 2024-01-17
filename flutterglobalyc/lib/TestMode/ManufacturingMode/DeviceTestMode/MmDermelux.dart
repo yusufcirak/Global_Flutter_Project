@@ -14,39 +14,37 @@ class MmDermelux extends StatefulWidget {
 
 class _MmDermeluxState extends State<MmDermelux> {
 
-  bool isHydroWand = false; //HydroWand Start/Stop
-  bool isCooling = false;   //Cooling Start/Stop
-  bool isOxy= false;        //Oxy Start/Stop
-  String logData = "";      //Log Data
-  String receivedData = "";     //Received Data
-  int simpleIntInput = 0;       //Cooling Setting
-  double receiveTempData= 0.0;      //Temperature
-  bool powerCheckResult = false;     //Power Check
-  bool temperatureCheckResult = false;    //Temperature Check
-  bool  HydroWand =false;                //HydroWand
-  String DeviceSerialNumber ="";        //Device Serial Number
+  bool isHydroWand = false;                    //HydroWand Start/Stop
+  bool isCooling = false;                     //Cooling Start/Stop
+  bool isOxy= false;                         //Oxy Start/Stop
+  String logData = "";                      //Log Data
+  String receivedData = "";                //Received Data
+  int simpleIntInput = 0;                 //Cooling Setting
+  double receiveTempData= 0.0;           //Temperature
+  bool powerCheckResult = false;        //Power Check
+  bool temperatureCheckResult = false; //Temperature Check
+  bool  HydroWand =false;             //HydroWand
+  String DeviceSerialNumber ="";     //Device Serial Number
   bool  Cooling=false;              //Cooling
-  bool  Oxy =false;               //Oxy
-  double  TempRead = 0.0;               //Temperature
-
-
-
-
-  
-
-
-
+  bool  Oxy =false;                //Oxy
+  double  TempRead = 0.0;         //Temperature
   @override
   void initState() {
     super.initState();
-   serialPortManager.openSerialPort();
- 
-    deviceCommand();
-  
+    _openSerialPort(); 
+  }
+  void _openSerialPort() async {
+    try {
+      await serialPortManager.openSerialPort();
+         deviceCommand();
+    } catch (e) {
+      print("Error opening the serial port: $e");
+     
+    }
   }
 
   void dispose() {
-   
+    serialPortManager.closeSerialPort(); // Close the serial port when closing the application
     super.dispose();
   }
 
@@ -464,7 +462,7 @@ class _MmDermeluxState extends State<MmDermelux> {
        if (receivedData.contains("Temperature:")) {
                 
                 final temperature = receivedData.split("Temperature:")[1].split(";")[0];
-            TempRead = double.parse(temperature); // Veriyi double türüne çevir
+            TempRead = double.parse(temperature); // Convert data to double
                 print("Temperature: $TempRead");
 }
       });

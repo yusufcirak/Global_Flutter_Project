@@ -13,6 +13,7 @@ class _QaModeLoginState extends State<QaModeLogin> {
   final String wifiSsid = "AndroidWifi"; // Bağlanılacak Wi-Fi ağının SSID'si
   final String wifiPassword = ""; // Wi-Fi şifresi
   bool _isConnected = false;
+    bool btnVisibalty=false;
 
   @override
   void initState() {
@@ -24,9 +25,13 @@ class _QaModeLoginState extends State<QaModeLogin> {
     bool isConnected = await WiFiForIoTPlugin.isConnected();
     setState(() {
       _isConnected = isConnected;
+      if(_isConnected){
+        btnVisibalty=false;
+      }else{
+        btnVisibalty=true;
+      }
     });
   }
-
   void _connectToWifi() async {
     try {
       await WiFiForIoTPlugin.connect(
@@ -94,13 +99,15 @@ class _QaModeLoginState extends State<QaModeLogin> {
                 ),
 
                 SizedBox(height: 20.0),
-                Row(
+               Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                 OutlinedButton(
                   onPressed: () {
 
                     if (_isConnected) {
+
+                        
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -126,30 +133,31 @@ class _QaModeLoginState extends State<QaModeLogin> {
                   ),
                 ),
                SizedBox(width: 20.0),
-                  OutlinedButton(
-                  onPressed: () {
-
-                    Navigator.push(
+                 Visibility(
+                  visible: btnVisibalty, 
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => QaModeSDevice(),
+                          builder: (context) => QaModeSDevice(),
                         ),
                       );
-                  
- 
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(width: 2.0, color: Colors.blue),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(width: 2.0, color: Colors.blue),
+                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    ),
+                    child: Text(
+                      'Offline Continue',
+                      style: TextStyle(fontSize: 18, color: Colors.blue),
+                    ),
                   ),
-                  child: Text(
-                    'Offline Continue',
-                    style: TextStyle(fontSize: 18, color: Colors.blue),
-                  ),
-                ),
+                )
+
      
                   ],
-                ),  
+                ),   
               ],
             ),
           ),

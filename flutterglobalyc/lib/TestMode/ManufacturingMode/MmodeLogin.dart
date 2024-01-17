@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/MmodeSDevice.dart';
+import 'package:flutterglobalyc/DatabaseHelperUpdate.dart';
+import 'package:package_info/package_info.dart';
 import 'package:flutterglobalyc/SerialPortManager.dart';
-
 
 class MmodeLogin extends StatefulWidget {
   @override
@@ -12,14 +14,21 @@ class MmodeLogin extends StatefulWidget {
 
 class _MmodeLoginState extends State<MmodeLogin> {
     final serialPortManager = SerialPortManager();
-  final String wifiSsid = "AndroidWifi"; 
-  final String wifiPassword = ""; 
+  final String wifiSsid = "EstheticCA1"; //add wifi ssid
+  final String wifiPassword = "8889993996";       //add wifi pass
   bool _isConnected = false;
-  bool btnVisibalty=false;
+  bool btnVisibility = false;
   String receivedData = "";
+
+   // StreamController for Wi-Fi connection status
+  StreamController<bool> _wifiConnectionStreamController =
+      StreamController<bool>();
+
+
   @override
   void initState() {
     super.initState();
+    _initPackageInfo();
     _checkWifiConnection();
 
     serialPortManager.openSerialPort();
@@ -30,17 +39,36 @@ class _MmodeLoginState extends State<MmodeLogin> {
       });
     });
   }
+   void _initPackageInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    String softwareVersion = packageInfo.version;
 
-  void _checkWifiConnection() async {
+    // Veritabanına software version bilgisini kaydet
+    saveSoftwareVersion(softwareVersion,wifiSsid, wifiPassword);
+  }
+   void saveSoftwareVersion(String softwareVersion,String ssid, String password) async {
+    DatabaseHelperUpdate dbHelper = DatabaseHelperUpdate();
+    Map<String, dynamic> row = {
+      'softwareVersion': softwareVersion,
+          'wifiSsid': ssid,
+        'wifiPass': password,
+    };
+    await dbHelper.insertUpdate(row);
+  }
+
+   void _checkWifiConnection() async {
     bool isConnected = await WiFiForIoTPlugin.isConnected();
     setState(() {
       _isConnected = isConnected;
-      if(_isConnected){
-        btnVisibalty=false;
-      }else{
-        btnVisibalty=true;
+      if (_isConnected) {
+        btnVisibility = false;
+      } else {
+        btnVisibility = true;
       }
     });
+
+    // Update the Wi-Fi connection status in the stream
+    _wifiConnectionStreamController.add(_isConnected);
   }
 
   void _connectToWifi() async {
@@ -58,8 +86,12 @@ class _MmodeLoginState extends State<MmodeLogin> {
       print("Error connecting to Wi-Fi: $e");
     }
   }
-
-  @override
+    @override
+  void dispose() {
+      _wifiConnectionStreamController.close(); // Close the stream controller
+    super.dispose();
+  }
+@override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -88,89 +120,82 @@ class _MmodeLoginState extends State<MmodeLogin> {
                   ),
                 ),
                 SizedBox(height: 50.0),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-
-                       _isConnected
-                          ? Icons.wifi
-                          : Icons.warning,
-                     
-                      size: 100,
-                      color: const Color.fromARGB(255, 54, 53, 53),
-                    ),
-                    SizedBox(width: 10.0),
-                    Text(
-                      _isConnected
-                          ? 'Wi-Fi Connected!'
-                          : 'Wi-Fi Disconnected! Please check Wi-Fi router \nSSID - $wifiSsid',
-                      style: TextStyle(fontSize: 20, color: Colors.black),
-                    ),
-                  ],
+                StreamBuilder<bool>(
+                  stream: _wifiConnectionStreamController.stream,
+                  initialData: false,
+                  builder: (context, snapshot) {
+                    bool isConnected = snapshot.data ?? false;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          isConnected ? Icons.wifi : Icons.warning,
+                          size: 100,
+                          color: const Color.fromARGB(255, 54, 53, 53),
+                        ),
+                        SizedBox(width: 10.0),
+                        Text(
+                          isConnected
+                              ? 'Wi-Fi Connected!'
+                              : 'Wi-Fi Disconnected! Please check Wi-Fi router \nSSID - $wifiSsid',
+                          style: TextStyle(fontSize: 20, color: Colors.black),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-
                 SizedBox(height: 20.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                OutlinedButton(
-                  onPressed: () {
-
-                    if (_isConnected) {
-
-                        serialPortManager.sendData(wifiSsid+';'+wifiPassword+';');
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MmodeSDevice(),
-                        ),
-                      );
-                    } else {
-                      _connectToWifi();
-                    }
-                  
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(width: 2.0, color: Colors.blue),
-                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-                  ),
-                  child: Text(
-
-                      _isConnected
-                          ? 'Continue'
-                          : 'Search Wifi',
-                   
-                    style: TextStyle(fontSize: 18, color: Colors.blue),
-                  ),
-                ),
-               SizedBox(width: 20.0),
-                 Visibility(
-                  visible: btnVisibalty, 
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MmodeSDevice(),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(width: 2.0, color: Colors.blue),
-                      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                    OutlinedButton(
+                      onPressed: () {
+                        if (_isConnected) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MmodeSDevice(),
+                            ),
+                          );
+                        } else {
+                          _connectToWifi();
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(width: 2.0, color: Colors.blue),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                      ),
+                      child: Text(
+                        _isConnected ? 'Continue' : 'Search Wifi',
+                        style: TextStyle(fontSize: 18, color: Colors.blue),
+                      ),
                     ),
-                    child: Text(
-                      'Offline Continue',
-                      style: TextStyle(fontSize: 18, color: Colors.blue),
-                    ),
-                  ),
-                )
-
-     
+                    SizedBox(width: 20.0),
+                    Visibility(
+                      visible: btnVisibility,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MmodeSDevice(),
+                            ),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(width: 2.0, color: Colors.blue),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+                        ),
+                        child: Text(
+                          'Offline Continue',
+                          style: TextStyle(fontSize: 18, color: Colors.blue),
+                        ),
+                      ),
+                    )
                   ],
-                ),  
+                ),
               ],
             ),
           ),
@@ -178,7 +203,10 @@ class _MmodeLoginState extends State<MmodeLogin> {
       ),
     );
   }
+
+  
 }
+
 
 void main() {
   runApp(MaterialApp(

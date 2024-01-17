@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterglobalyc/DatabaseHelper.dart';
 import 'package:flutterglobalyc/TestMode/TestModeNawbar.dart';
+import 'package:flutterglobalyc/Update/UpdateNawbar.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -65,14 +66,24 @@ class _SettingsState extends State<Settings> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
+                          builder: (context) => UpdateNawbar(),
+                        ),
+                      );
+                    },
+                    child: Text('Update Mode'),
+                  ),
+                  SizedBox(width: 16.0), // İstedğiniz kadar boşluk ekleyebilirsiniz
+                      ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
                           builder: (context) => TestModeNawbar(),
                         ),
                       );
                     },
                     child: Text('Test Mode'),
                   ),
-                  SizedBox(width: 16.0), // İstedğiniz kadar boşluk ekleyebilirsiniz
-                 
                 ],
               ),
             ),
@@ -100,3 +111,9 @@ class _SettingsState extends State<Settings> {
     );
   }
 }
+  void main() {
+    runApp(MaterialApp(
+      home: Settings(),
+    ));
+  }
+

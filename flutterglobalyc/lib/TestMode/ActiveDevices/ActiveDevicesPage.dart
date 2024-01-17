@@ -227,7 +227,7 @@ class ActiveDevicesPage extends StatelessWidget {
                         };
 
                         // Veritabanına verileri ekle
-                        dbHelper.insertData(data);
+                        dbHelper.insertOrUpdate(data);
 
                         // Yeni sayfaya yönlendirme
                         Navigator.push(

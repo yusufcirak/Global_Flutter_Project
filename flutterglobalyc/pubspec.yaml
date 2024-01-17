@@ -19,6 +19,12 @@ dependencies:
   permission_handler: ^11.1.0
   convert: ^3.0.1
   root: ^2.0.4
+  dio: ^4.0.0
+  package_info: ^2.0.2
+  http: ^1.1.2
+  path_provider: ^2.0.15
+  
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

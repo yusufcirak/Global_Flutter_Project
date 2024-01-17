@@ -10,7 +10,7 @@ class PersonalCodePage extends StatelessWidget {
 
   Future<void> saveCode(int code) async {
     final Map<String, dynamic> data = {'personalcode': code};
-    await dbHelper.insertData(data);
+    await dbHelper.insertOrUpdate(data);
   }
 
   @override

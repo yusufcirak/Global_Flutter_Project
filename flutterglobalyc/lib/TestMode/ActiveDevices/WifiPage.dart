@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 import 'package:flutterglobalyc/TestMode/ActiveDevices/PersonalCodePage.dart';
-
+import 'package:flutterglobalyc/DatabaseHelperUpdate.dart';
+import 'package:flutterglobalyc/SerialPortManager.dart';
 class WifiPage extends StatefulWidget {
   @override
   _WifiPageState createState() => _WifiPageState();
 }
 
 class _WifiPageState extends State<WifiPage> {
-
+  final serialPortManager = SerialPortManager();
   
   List<WifiNetwork> _wifiNetworks = [];
   String _selectedSSID = '';
@@ -19,7 +20,13 @@ class _WifiPageState extends State<WifiPage> {
   void initState() {
     super.initState();
     _loadWifiNetworks();
+    serialPortManager.openSerialPort();
+
   }
+
+
+
+
 
   void _loadWifiNetworks() async {
     try {
@@ -32,48 +39,67 @@ class _WifiPageState extends State<WifiPage> {
     }
   }
 
-  void _connectToWifi(String ssid, String password) async {
-    if (ssid.isNotEmpty) {
-      try {
-        setState(() {
-          _connecting = true;
-        });
+ void _connectToWifi(String ssid, String password) async {
+  if (ssid.isNotEmpty) {
+    try {
+      setState(() {
+        _connecting = true;
+      });
 
-        final result = await WiFiForIoTPlugin.connect(
-          ssid,
-          password: password,
-          security: NetworkSecurity.WPA,
-          joinOnce: false,
+      final result = await WiFiForIoTPlugin.connect(
+        ssid,
+        password: password,
+        security: NetworkSecurity.WPA,
+        joinOnce: false,
+      );
+
+      if (result) {
+        print('Connection successful.');
+
+        await _saveWifiInfo(ssid, password);
+
+       
+        await _sendWifiInfoToSerialPort(ssid, password);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PersonalCodePage(),
+          ),
         );
-
-        setState(() {
-          _connecting = false;
-        });
-
-        if (result) {
-          print('Connection successful.');
-          // Bağlantı başarılıysa, yeni sayfaya geçiş yap
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PersonalCodePage(),
-            ),
-          );
-        } else {
-          print('Connection failed.');
-          // Bağlantı hatası mesajı buraya eklenebilir
-        }
-      } on Exception catch (e) {
-        print("Connection error: $e");
-        setState(() {
-          _connecting = false;
-        });
+      } else {
+        print('Connection failed.');
       }
-    } else {
-      print('Invalid Wi-Fi network.');
-      // Kullanıcıya bildirim veya uyarı gösterebilirsiniz
+
+      setState(() {
+        _connecting = false;
+      });
+    } on Exception catch (e) {
+      print("Connection error: $e");
+      setState(() {
+        _connecting = false;
+      });
     }
+  } else {
+    print('Invalid Wi-Fi network.');
   }
+}
+
+Future<void> _sendWifiInfoToSerialPort(String ssid, String password) async {
+  
+  serialPortManager.sendData(ssid+";"+password+";");
+}
+
+Future<void> _saveWifiInfo(String ssid, String password) async {
+  DatabaseHelperUpdate dbHelper = DatabaseHelperUpdate();
+  Map<String, dynamic> row = {
+    'wifiSsid': ssid,
+    'wifiPass': password,
+
+  };
+  await dbHelper.insertOrUpdate(row);
+}
+
 
   Future<void> _showPasswordDialog(String ssid) async {
     return showDialog<void>(

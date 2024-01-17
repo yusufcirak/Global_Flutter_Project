@@ -1,39 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmDermelux.dart';
+import 'package:flutterglobalyc/TestMode/ManufacturingMode/MmodeSoftwareUpdate.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmHydroVerstand.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmVerstandHD.dart';
 import 'package:flutterglobalyc/TestMode/ManufacturingMode/DeviceTestMode/MmCoolRestore.dart';
-import 'package:flutterglobalyc/SerialPortManager.dart';
+
+
 
 class MmodeSDevice extends StatefulWidget {
   @override
   _MmodeSDeviceState createState() => _MmodeSDeviceState();
-  final serialPortManager = SerialPortManager();
 }
 
+
 class _MmodeSDeviceState extends State<MmodeSDevice> {
-  String _selectedDevice = "";
-  List<String> deviceList = ["DermeLuxx", "HydroVerstand", "Verstand HD", "CoolRestore"];
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    deviceList = deviceList.toSet().toList();
-
    
-    if (deviceList.isNotEmpty) {
-      _selectedDevice = deviceList.first;
-    }
-  }
+  bool _isLoading = false;
+  bool _showProgressBar = false;
+  String receivedData = ""; // Varsayılan başlangıç değeri
+  final List<String> deviceList = [
+    
+    "DermeLuxx",
+    "HydroVerstand",
+    "Verstand HD",
+    "CoolRestore",
+  ];
+  String _selectedDevice = "DermeLuxx";
 
   Future<void> _startProcess() async {
     setState(() {
       _isLoading = true;
+      _showProgressBar = false; 
     });
 
-  
     const delayDuration = Duration(seconds: 5);
 
     await Future.delayed(delayDuration);
@@ -45,35 +43,16 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
     print("Selected Device: $_selectedDevice");
 
     if (_selectedDevice == "DermeLuxx") {
-      serialPortManager.sendData("update;");
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MmDermelux(),
-        ),
-      );
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MmodeSoftwareUpdate()));
+
     } else if (_selectedDevice == "HydroVerstand") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MmHydroVerstand(),
-        ),
-      );
-    } else if (_selectedDevice == "Verstand HD") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MmVerstandHD(),
-        ),
-      );
-    } else if (_selectedDevice == "CoolRestore") {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MmCoolRestore(),
-        ),
-      );
-    }
+      Navigator.push(context, MaterialPageRoute(builder: (context) => MmHydroVerstand()));
+    }else if (_selectedDevice == "Verstand HD") {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => MmVerstandHD()));
+  }else if (_selectedDevice == "CoolRestore") {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => MmCoolRestore()));
+  }
   }
 
   @override
@@ -105,7 +84,6 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                   ),
                 ),
                 SizedBox(height: 50.0),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -118,7 +96,6 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                     ),
                   ],
                 ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -141,55 +118,72 @@ class _MmodeSDeviceState extends State<MmodeSDevice> {
                     ),
                   ],
                 ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                  ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : () {
-                                  _startProcess();
-                                serialPortManager.sendData("update;"); 
-                                },
-                          style: ElevatedButton.styleFrom(
-                            side: BorderSide(width: 2.0, color: Colors.blue),
-                            padding: EdgeInsets.symmetric(
-                              vertical: 15,
-                              horizontal: 30,
-                            ),
-                          ),
-                          child: Text(
-                            'Start',
-                            style: TextStyle(fontSize: 18, color: Colors.blue),
-                          ),
+                    ElevatedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              _startProcess();
+                             
+                            },
+                      style: ElevatedButton.styleFrom(
+                        side: BorderSide(width: 2.0, color: Colors.blue),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 30,
                         ),
+                      ),
+                      child: Text(
+                        'Start',
+                        style: TextStyle(fontSize: 18, color: Colors.blue),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
-
           // Progress bar eklemek için
-            if (_isLoading)
-  Positioned(
-    top: 650.0,
-    left: 0,
-    right: 0,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), 
-        ),
-        SizedBox(height: 10),
-        Text(
-          "Please wait...\nUpdate in progress..",
-          textAlign: TextAlign.center, // Yazıyı ortalamak için bu özelliği ekledik
-        ),
-      ],
-    ),
-  ),
+          if (_isLoading)
+            Positioned(
+              top: 650.0,
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Please wait...",
+                    textAlign: TextAlign.center, // Yazıyı ortalamak için bu özelliği ekledik
+                  ),
+                ],
+              ),
+            ),
+          if (_showProgressBar)
+            Positioned(
+              top: 650.0,
+              left: 0,
+              right: 0,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "Please wait...",
+                    textAlign: TextAlign.center, // Yazıyı ortalamak için bu özelliği ekledik
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );

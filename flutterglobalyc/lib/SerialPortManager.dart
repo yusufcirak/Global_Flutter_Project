@@ -4,19 +4,39 @@ class SerialPortManager {
   static const MethodChannel _channel = MethodChannel('serial_port_channel');
 
   Future<void> openSerialPort() async {
-    await _channel.invokeMethod('openSerialPort');
+    // try {
+    //   await _channel.invokeMethod('openSerialPort');
+    // } catch (e) {
+    //   print("Seri port açılırken hata oluştu: $e");
+    
+    // }
   }
 
   Future<void> closeSerialPort() async {
-    await _channel.invokeMethod('closeSerialPort');
+    // try {
+    //   await _channel.invokeMethod('closeSerialPort');
+    // } catch (e) {
+    //   print("Seri port kapatılırken hata oluştu: $e");
+    //   // Hata oluştuğunda yapılacak işlemler...
+    // }
   }
 
   Future<void> sendData(String data) async {
-    await _channel.invokeMethod('sendData', {'data': data});
+    // try {
+    //   await _channel.invokeMethod('sendData', {'data': data});
+    // } catch (e) {
+    //   print("Seri porta veri gönderilirken hata oluştu: $e");
+    //   // Hata oluştuğunda yapılacak işlemler...
+    // }
   }
 
   Future<String> readData() async {
-    final String receivedData = await _channel.invokeMethod('readData');
-    return receivedData;
+   try {
+       final String receivedData = await _channel.invokeMethod('readData');
+       return receivedData;
+     } catch (e) {
+       print("Veri okunurken hata oluştu: $e");
+       return "Hata: Veri okunamadı";
+     }
   }
 }
